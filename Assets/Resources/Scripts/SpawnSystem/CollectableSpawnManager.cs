@@ -27,17 +27,8 @@ namespace Platformer {
                 spawnTimer.Start();           
             };
         }
-
-        private void Start() {
-            spawnTimer.Start();       
-        }
-
-        private void Update() {
-            spawnTimer.Tick(Time.deltaTime);
-        }
-
-        public override void Spawn() {
-            spawner.Spawn();
-        }
+        private void Start() => spawnTimer.Start();       
+        private void Update() => spawnTimer.Tick(Time.deltaTime);
+        public override void Spawn() => spawner.Spawn();
     }
 }

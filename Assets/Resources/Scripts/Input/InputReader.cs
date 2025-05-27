@@ -15,6 +15,7 @@ namespace Platformer
         public event UnityAction EnableMouseControlCamera = delegate { };
         public event UnityAction DisableMouseControlCamera = delegate { };
         public event UnityAction<bool> Jump = delegate { };
+        public event Action Dash;
 
         public Vector3 Direction => playerInputAction.Player.Move.ReadValue<Vector2>();
         private PlayerInputAction playerInputAction;
@@ -43,7 +44,7 @@ namespace Platformer
             context.control.device.name == "Mouse";
 
         public void OnFire(InputAction.CallbackContext context) {
-            //null
+            Dash?.Invoke();       
         }
 
         public void OnMouseCameraController(InputAction.CallbackContext context) {
