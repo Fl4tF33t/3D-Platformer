@@ -16,8 +16,13 @@ namespace Platformer {
         [Header("Jump Settings")]
         [SerializeField] private float jumpForce = 10f;
         [SerializeField] private float jumpDuration = 0.5f;
-        [SerializeField] private float jumpCooldown = 0f;
+        [SerializeField] private float jumpCooldown = 0.5f;
         [SerializeField] private float gravityMultiplier = 3f;
+        
+        [Header("Dash Settings")]
+        [SerializeField] private float dashForce = 12f;
+        [SerializeField] private float dashDuration = 0.5f;
+        [SerializeField] private float dashCooldown = 1.5f;
         
         private const float ZERO_F = 0f;
         private Rigidbody rigidBody;
@@ -25,14 +30,17 @@ namespace Platformer {
         private Animator animator;
         private Transform mainCamera;
         
+        private Vector3 movement;
         private float currentSpeed;
         private float velocity;
-        private Vector3 movement;
         private float jumpVelocity;
+        private float dashVelocity = 1f;
 
         private List<Timer> timers;
         private CountdownTimer jumpTimer;
         private CountdownTimer jumpCooldownTimer;
+        private CountdownTimer dashTimer;
+        private CountdownTimer dashCooldownTimer;
         
         //Animator properties
         static readonly int Speed = Animator.StringToHash("Speed");
@@ -48,10 +56,18 @@ namespace Platformer {
             // Setup timers
             jumpTimer = new CountdownTimer(jumpDuration);
             jumpCooldownTimer = new CountdownTimer(jumpCooldown);
-            timers = new List<Timer>(2) { jumpTimer, jumpCooldownTimer };
+            dashTimer = new CountdownTimer(dashDuration);
+            dashCooldownTimer = new CountdownTimer(dashCooldown);
             
             jumpTimer.OnTimerStart += () => jumpVelocity = jumpForce;
             jumpTimer.OnTimerStop += () => jumpCooldownTimer.Start();
+            dashTimer.OnTimerStart += () => dashVelocity = dashForce;
+            dashTimer.OnTimerStop += () => {
+                dashVelocity = 1f;
+                dashCooldownTimer.Start();
+            };
+            
+            timers = new List<Timer>(4) { jumpTimer, jumpCooldownTimer, dashTimer, dashCooldownTimer };
             
             // Setup state machine
             stateMachine = new StateMachine();
@@ -59,10 +75,12 @@ namespace Platformer {
             // Declare states
             LocomotionState locomotionState = new LocomotionState(this, animator);
             JumpState jumpState = new JumpState(this, animator);
+            DashState dashState = new DashState(this, animator);
             
             // Define Transitions
             At(locomotionState, jumpState, new FuncPredicate(() => jumpTimer.IsRunning));
-            At(jumpState, locomotionState, new FuncPredicate(() => groundChecker.IsGrounded && !jumpTimer.IsRunning));
+            At(locomotionState, dashState, new FuncPredicate(() => dashTimer.IsRunning));
+            Any(locomotionState, new FuncPredicate(() => !jumpTimer.IsRunning && !dashTimer.IsRunning && groundChecker.IsGrounded));
             
             // Set the initial state
             stateMachine.SetState(locomotionState);
@@ -79,6 +97,14 @@ namespace Platformer {
         private void OnDisable() {
             inputReader.Jump -= OnJump;
             inputReader.Dash -= OnDash;
+        }
+
+        private void OnDash(bool performed) {   
+            if (performed && !dashTimer.IsRunning && !dashCooldownTimer.IsRunning) {
+                dashTimer.Start();
+            } else if (!performed && dashTimer.IsRunning) {
+                dashTimer.Stop();
+            }
         }
 
         private void OnJump(bool performed) {
@@ -111,6 +137,7 @@ namespace Platformer {
         private void UpdateAnimator() {
             animator.SetFloat(Speed, currentSpeed);
         }
+
         public void HandleJump() {
             // If not jumping and grounded
             if (!jumpTimer.IsRunning && groundChecker.IsGrounded) {
@@ -139,7 +166,7 @@ namespace Platformer {
         }
         private void HandleHorizontalMovement(Vector3 adjustedDirection) {
             // Move the character
-            Vector3 adjustedVelocity = adjustedDirection * (moveSpeed * Time.fixedDeltaTime);;
+            Vector3 adjustedVelocity = adjustedDirection * (moveSpeed * dashVelocity * Time.fixedDeltaTime);;
             rigidBody.linearVelocity = new Vector3(adjustedVelocity.x, rigidBody.linearVelocity.y, adjustedVelocity.z);
         }
         private void HandleRotation(Vector3 adjustedDirection) {
