@@ -11,6 +11,11 @@ public static class SetUp {
         Refresh();
     }
 
+    [MenuItem("Tools/SetUp/Import My Favourite Assets")]
+    public static void ImportFavouriteAssets() {
+        Assets.ImportAsset("DOTween HOTween v2.unitypackage", "Demigiant/Editor ExtensionsAnimation");
+    }
+
     private static class Folders {
         public static void CreateDefault(string root, params string[] folders) {
             string fullPath = Combine(Application.dataPath, root);
@@ -20,6 +25,12 @@ public static class SetUp {
                     CreateDirectory(path);  
                 }
             }
+        }
+    }
+    
+    public static class Assets {
+        public static void ImportAsset(string asset, string subfolder, string folder = "C:/Users/helmy/AppData/Roaming/Unity/Asset Store-5.x") {
+            AssetDatabase.ImportPackage(Combine(folder, subfolder, asset), false);;
         }
     }
 }

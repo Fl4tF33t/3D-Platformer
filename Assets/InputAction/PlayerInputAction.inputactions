@@ -27,7 +27,7 @@
                     "name": "Fire",
                     "type": "Button",
                     "id": "3bb52f8d-2570-467a-86ca-7f2667e1c977",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -36,6 +36,15 @@
                     "name": "MouseCameraController",
                     "type": "Button",
                     "id": "fc1c0372-3c8d-40ae-91a0-38d592c23fdf",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Jump",
+                    "type": "Button",
+                    "id": "6625fe5c-2925-4779-8516-b5cf3e122117",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -271,6 +280,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "MouseCameraController",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "751960eb-2f7d-49e5-a8e1-8beca73dd97e",
+                    "path": "<Keyboard>/space",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Jump",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

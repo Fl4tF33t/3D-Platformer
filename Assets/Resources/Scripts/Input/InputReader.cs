@@ -14,6 +14,7 @@ namespace Platformer
         public event Action<bool> onMouseControlCamera;
         public event UnityAction EnableMouseControlCamera = delegate { };
         public event UnityAction DisableMouseControlCamera = delegate { };
+        public event UnityAction<bool> Jump = delegate { };
 
         public Vector3 Direction => playerInputAction.Player.Move.ReadValue<Vector2>();
         private PlayerInputAction playerInputAction;
@@ -58,6 +59,19 @@ namespace Platformer
                 default:
                     break;
             }
+        }
+
+        public void OnJump(InputAction.CallbackContext context) {
+            switch (context.phase) {
+                case InputActionPhase.Started:
+                    Jump.Invoke(true);
+                    break;
+                case InputActionPhase.Canceled:
+                    Jump.Invoke(false);   
+                    break;
+                default:
+                    break;
+            }        
         }
     }
 }
